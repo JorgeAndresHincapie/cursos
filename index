@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plataforma de Cursos – Jorge Andrés Hincapié Correa</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background-color: #f4f6f9;
+        color: #2c3e50;
+        min-height: 100vh;
+    }
+    a { color: #2c3e50; }
+    header {
+        background-color: #2c3e50;
+        color: white;
+        padding: 16px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    header h1 { margin: 0; font-size: 20px; }
+    header .usuario-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    .badge {
+        background-color: #27ae60;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .badge.profesor { background-color: #e67e22; }
+    button, .btn {
+        border: none;
+        cursor: pointer;
+        border-radius: 6px;
+        font-weight: bold;
+        padding: 10px 18px;
+        font-size: 14px;
+        background-color: #27ae60;
+        color: white;
+        transition: background-color .15s ease;
+    }
+    button:hover, .btn:hover { background-color: #1e8449; }
+    button.secundario { background-color: #7f8c8d; }
+    button.secundario:hover { background-color: #636e72; }
+    button.peligro { background-color: #c0392b; }
+    button.peligro:hover { background-color: #922b21; }
+    button.chico { padding: 6px 12px; font-size: 13px; }
+    main { max-width: 1000px; margin: 0 auto; padding: 30px 20px 80px; }
+    .oculto { display: none !important; }
+
+    .tarjeta {
+        background: white;
+        border-radius: 8px;
+        padding: 24px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        margin-bottom: 24px;
+    }
+    .tarjeta h2 { margin-top: 0; }
+    label { display: block; font-weight: bold; font-size: 14px; margin-bottom: 6px; margin-top: 14px; }
+    input, select, textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-family: inherit;
+        font-size: 14px;
+    }
+    textarea { resize: vertical; }
+    .fila { display: flex; gap: 16px; flex-wrap: wrap; }
+    .fila > div { flex: 1; min-width: 160px; }
+    .mensaje { font-size: 14px; margin-top: 10px; min-height: 18px; }
+    .mensaje.ok { color: #27ae60; }
+    .mensaje.error { color: #c0392b; }
+
+    .grid-cursos {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 18px;
+    }
+    .curso-card {
+        background: white;
+        border-radius: 8px;
+        border-left: 5px solid #27ae60;
+        padding: 18px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .curso-card .semestre {
+        display: inline-block;
+        background: #eef1f5;
+        color: #4a5568;
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-weight: bold;
+        width: fit-content;
+    }
+    .curso-card h3 { margin: 4px 0; font-size: 17px; }
+    .curso-card p { font-size: 13px; color: #5b6573; margin: 0; flex-grow: 1; }
+    .curso-card .acciones { display: flex; gap: 8px; margin-top: 8px; }
+
+    .tabs { display: flex; gap: 6px; border-bottom: 2px solid #eee; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab-btn {
+        background: none; color: #5b6573; padding: 10px 16px; border-radius: 6px 6px 0 0;
+        font-weight: bold;
+    }
+    .tab-btn.activo { background-color: #eef1f5; color: #2c3e50; }
+    .tab-btn:hover { background-color: #eef1f5; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    table th, table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; vertical-align: top; }
+    table th { color: #5b6573; font-size: 12px; text-transform: uppercase; }
+
+    .actividad-item {
+        border: 1px solid #e3e6ea;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 14px;
+    }
+    .actividad-item .encabezado { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+    .actividad-item h4 { margin: 0 0 4px; }
+    .tipo-pill {
+        font-size: 11px; font-weight: bold; text-transform: uppercase;
+        background: #2c3e50; color: white; padding: 2px 8px; border-radius: 10px;
+    }
+    .detalle-pequeno { font-size: 13px; color: #6b7785; margin: 4px 0; }
+    .calificacion-pill {
+        font-weight: bold; padding: 4px 10px; border-radius: 6px; font-size: 14px;
+        background: #eafaf1; color: #1e8449; display: inline-block;
+    }
+    .estado-pendiente { color: #c0392b; font-weight: bold; font-size: 13px; }
+    .estado-entregado { color: #2980b9; font-weight: bold; font-size: 13px; }
+
+    .resumen-nota {
+        background: #2c3e50; color: white; border-radius: 8px; padding: 16px 20px;
+        margin-bottom: 20px; font-size: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+    }
+    .resumen-nota .nota-grande { font-size: 26px; font-weight: bold; color: #f1c40f; }
+
+    .aviso-config {
+        background-color: #fdecea; border: 1px solid #e74c3c; color: #c0392b;
+        border-radius: 8px; padding: 16px 20px; margin: 20px auto; max-width: 700px; font-size: 14px; line-height: 1.5;
+    }
+    .aviso-config strong { display: block; margin-bottom: 6px; }
+
+    .cargando { text-align: center; color: #8a93a0; padding: 20px; }
+    .vacio { text-align: center; color: #8a93a0; padding: 30px; font-style: italic; }
+
+    .enlace-volver { display: inline-block; margin-bottom: 16px; font-size: 14px; font-weight: bold; cursor: pointer; }
+
+    footer { text-align: center; padding: 24px; font-size: 13px; color: #8a93a0; }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>📚 Plataforma de Cursos — Jorge Andrés Hincapié Correa</h1>
+    <div class="usuario-info oculto" id="caja-usuario">
+        <span id="texto-usuario"></span>
+        <span class="badge" id="badge-rol"></span>
+        <button class="secundario chico" id="btn-cerrar-sesion">Cerrar sesión</button>
+    </div>
+</header>
+
+<div id="aviso-config" class="aviso-config oculto">
+    <strong>⚠️ Falta configurar Firebase</strong>
+    Reemplaza los valores de ejemplo en "firebaseConfig" dentro del código con los datos de tu nuevo proyecto de Firebase, y activa Authentication (correo/contraseña) y Firestore. Revisa las instrucciones que te dieron junto con este archivo.
+</div>
+
+<main>
+
+    <!-- ============ AUTENTICACIÓN ============ -->
+    <section id="vista-auth">
+        <div class="tarjeta" style="max-width:420px; margin:40px auto;">
+            <div class="tabs">
+                <button class="tab-btn activo" id="tab-login" type="button">Iniciar sesión</button>
+                <button class="tab-btn" id="tab-registro" type="button">Crear cuenta</button>
+            </div>
+
+            <form id="form-login">
+                <label for="login-email">Correo</label>
+                <input type="email" id="login-email" required>
+                <label for="login-password">Contraseña</label>
+                <input type="password" id="login-password" required>
+                <button type="submit" style="margin-top:18px; width:100%;">Iniciar sesión</button>
+                <p class="mensaje" id="mensaje-login"></p>
+            </form>
+
+            <form id="form-registro" class="oculto">
+                <label for="registro-nombre">Nombre completo</label>
+                <input type="text" id="registro-nombre" required>
+                <label for="registro-email">Correo</label>
+                <input type="email" id="registro-email" required>
+                <label for="registro-password">Contraseña (mínimo 6 caracteres)</label>
+                <input type="password" id="registro-password" minlength="6" required>
+                <button type="submit" style="margin-top:18px; width:100%;">Crear cuenta de estudiante</button>
+                <p class="mensaje" id="mensaje-registro"></p>
+                <p style="font-size:12px; color:#8a93a0; margin-top:10px;">
+                    Las cuentas se crean como estudiante. Si eres el profesor, inicia sesión con tu correo autorizado.
+                </p>
+            </form>
+        </div>
+    </section>
+
+    <!-- ============ PANEL PROFESOR ============ -->
+    <section id="vista-profesor" class="oculto">
+        <div class="tarjeta">
+            <h2>Crear nuevo curso</h2>
+            <form id="form-crear-curso">
+                <div class="fila">
+                    <div>
+                        <label for="curso-nombre">Nombre del curso</label>
+                        <input type="text" id="curso-nombre" required placeholder="Ej: Análisis Estadístico Aplicado">
+                    </div>
+                    <div>
+                        <label for="curso-semestre">Semestre</label>
+                        <input type="text" id="curso-semestre" required placeholder="Ej: 2026-1">
+                    </div>
+                </div>
+                <label for="curso-descripcion">Descripción</label>
+                <textarea id="curso-descripcion" rows="3" placeholder="¿De qué trata el curso?"></textarea>
+                <button type="submit" style="margin-top:14px;">Crear curso</button>
+                <p class="mensaje" id="mensaje-crear-curso"></p>
+            </form>
+        </div>
+
+        <div class="tarjeta">
+            <h2>Mis cursos</h2>
+            <div id="lista-cursos-profesor" class="grid-cursos">
+                <p class="cargando">Cargando cursos...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ GESTIÓN DE UN CURSO (PROFESOR) ============ -->
+    <section id="vista-gestion-curso" class="oculto">
+        <span class="enlace-volver" id="volver-profesor">← Volver a mis cursos</span>
+        <div class="tarjeta">
+            <span class="semestre" id="gestion-semestre"></span>
+            <h2 id="gestion-nombre-curso"></h2>
+            <p id="gestion-descripcion-curso" style="color:#5b6573;"></p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn activo" data-tab="actividades" type="button">Actividades y evaluaciones</button>
+            <button class="tab-btn" data-tab="estudiantes" type="button">Estudiantes inscritos</button>
+            <button class="tab-btn" data-tab="entregas" type="button">Entregas y calificación</button>
+        </div>
+
+        <!-- TAB: Actividades -->
+        <div id="tab-contenido-actividades" class="tarjeta">
+            <h3>Nueva actividad o evaluación</h3>
+            <form id="form-crear-actividad">
+                <div class="fila">
+                    <div>
+                        <label for="act-titulo">Título</label>
+                        <input type="text" id="act-titulo" required placeholder="Ej: Taller 1 - SPSS">
+                    </div>
+                    <div>
+                        <label for="act-tipo">Tipo</label>
+                        <select id="act-tipo">
+                            <option value="Tarea">Tarea</option>
+                            <option value="Taller">Taller</option>
+                            <option value="Quiz">Quiz</option>
+                            <option value="Parcial">Parcial</option>
+                            <option value="Proyecto final">Proyecto final</option>
+                            <option value="Participación">Participación</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="fila">
+                    <div>
+                        <label for="act-fecha">Fecha límite</label>
+                        <input type="date" id="act-fecha" required>
+                    </div>
+                    <div>
+                        <label for="act-peso">Peso en la nota final (%)</label>
+                        <input type="number" id="act-peso" min="1" max="100" required placeholder="Ej: 20">
+                    </div>
+                </div>
+                <label for="act-descripcion">Descripción / instrucciones</label>
+                <textarea id="act-descripcion" rows="3"></textarea>
+                <button type="submit" style="margin-top:14px;">Agregar actividad</button>
+                <p class="mensaje" id="mensaje-crear-actividad"></p>
+            </form>
+            <hr style="margin:24px 0; border-color:#eee;">
+            <h3>Actividades del curso</h3>
+            <div id="lista-actividades-profesor"><p class="cargando">Cargando...</p></div>
+        </div>
+
+        <!-- TAB: Estudiantes -->
+        <div id="tab-contenido-estudiantes" class="tarjeta oculto">
+            <h3>Estudiantes inscritos</h3>
+            <p style="font-size:13px; color:#8a93a0;">Comparte este correo de inicio de sesión con tus estudiantes para que creen su cuenta y luego se inscriban ellos mismos en este curso.</p>
+            <div id="lista-estudiantes"><p class="cargando">Cargando...</p></div>
+        </div>
+
+        <!-- TAB: Entregas y calificación -->
+        <div id="tab-contenido-entregas" class="tarjeta oculto">
+            <h3>Calificar entregas</h3>
+            <label for="selector-actividad-entregas">Selecciona una actividad</label>
+            <select id="selector-actividad-entregas"><option value="">-- Elige una actividad --</option></select>
+            <div id="lista-entregas" style="margin-top:18px;"></div>
+        </div>
+    </section>
+
+    <!-- ============ PANEL ESTUDIANTE ============ -->
+    <section id="vista-estudiante" class="oculto">
+        <div class="tabs">
+            <button class="tab-btn activo" data-tab-est="mis-cursos" type="button">Mis cursos</button>
+            <button class="tab-btn" data-tab-est="disponibles" type="button">Cursos disponibles</button>
+        </div>
+
+        <div id="tab-est-mis-cursos">
+            <div class="grid-cursos" id="lista-mis-cursos"><p class="cargando">Cargando...</p></div>
+        </div>
+
+        <div id="tab-est-disponibles" class="oculto">
+            <div class="grid-cursos" id="lista-cursos-disponibles"><p class="cargando">Cargando...</p></div>
+        </div>
+    </section>
+
+    <!-- ============ VISTA DE UN CURSO (ESTUDIANTE) ============ -->
+    <section id="vista-curso-estudiante" class="oculto">
+        <span class="enlace-volver" id="volver-estudiante">← Volver a mis cursos</span>
+        <div class="tarjeta">
+            <span class="semestre" id="est-semestre"></span>
+            <h2 id="est-nombre-curso"></h2>
+            <p id="est-descripcion-curso" style="color:#5b6573;"></p>
+        </div>
+
+        <div class="resumen-nota">
+            <span>Tu nota acumulada en este curso</span>
+            <span class="nota-grande" id="est-nota-acumulada">--</span>
+        </div>
+
+        <div id="lista-actividades-estudiante"></div>
+    </section>
+
+</main>
+
+<footer>&copy; 2026 Jorge Andrés Hincapié Correa — Plataforma de Cursos</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+    getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+    getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc,
+    query, orderBy, deleteDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// =====================================================================
+// 1) PASO OBLIGATORIO: reemplaza esto con la configuración de tu
+//    proyecto NUEVO de Firebase (ver instrucciones aparte).
+// =====================================================================
+const firebaseConfig = {
+    apiKey: "AIzaSyBY7pgtJrg73pjKwpckzeZBPXeX_R5it6U",
+    authDomain: "plataforma-cursos-jha.firebaseapp.com",
+    projectId: "plataforma-cursos-jha",
+    storageBucket: "plataforma-cursos-jha.firebasestorage.app",
+    messagingSenderId: "727573552335",
+    appId: "1:727573552335:web:418f20a347a47470ad2bba"
+};
+
+// Correos que tendrán automáticamente el rol de "profesor" al registrarse.
+// Debe coincidir EXACTAMENTE con lo que pongas en las reglas de Firestore.
+const CORREOS_PROFESOR = ["andriujha17@gmail.com"];
+
+const configEstaSinCompletar = firebaseConfig.apiKey === "TU_API_KEY" || !firebaseConfig.apiKey;
+if (configEstaSinCompletar) {
+    document.getElementById('aviso-config').classList.remove('oculto');
+}
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let usuarioActual = null; // { uid, nombre, email, rol }
+let cursoProfesorActivo = null; // id del curso que el profesor está gestionando
+let cursoEstudianteActivo = null; // id del curso que el estudiante está viendo
+
+// ---------- Helpers UI ----------
+function mostrar(id) { document.getElementById(id).classList.remove('oculto'); }
+function ocultar(id) { document.getElementById(id).classList.add('oculto'); }
+function setMensaje(id, texto, tipo) {
+    const el = document.getElementById(id);
+    el.textContent = texto;
+    el.className = 'mensaje ' + (tipo || '');
+}
+function escapeHTML(str) {
+    const d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
+}
+
+// ---------- Tabs login / registro ----------
+document.getElementById('tab-login').addEventListener('click', () => {
+    document.getElementById('tab-login').classList.add('activo');
+    document.getElementById('tab-registro').classList.remove('activo');
+    mostrar('form-login'); ocultar('form-registro');
+});
+document.getElementById('tab-registro').addEventListener('click', () => {
+    document.getElementById('tab-registro').classList.add('activo');
+    document.getElementById('tab-login').classList.remove('activo');
+    mostrar('form-registro'); ocultar('form-login');
+});
+
+// ---------- Registro ----------
+document.getElementById('form-registro').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('registro-nombre').value.trim();
+    const email = document.getElementById('registro-email').value.trim();
+    const password = document.getElementById('registro-password').value;
+    setMensaje('mensaje-registro', 'Creando cuenta...', '');
+    try {
+        const credencial = await createUserWithEmailAndPassword(auth, email, password);
+        const rol = CORREOS_PROFESOR.includes(email.toLowerCase()) ? 'profesor' : 'estudiante';
+        await setDoc(doc(db, 'usuarios', credencial.user.uid), {
+            nombre, email, rol, fechaRegistro: serverTimestamp()
+        });
+        setMensaje('mensaje-registro', '¡Cuenta creada!', 'ok');
+    } catch (error) {
+        setMensaje('mensaje-registro', traducirErrorAuth(error), 'error');
+    }
+});
+
+// ---------- Login ----------
+document.getElementById('form-login').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    setMensaje('mensaje-login', 'Ingresando...', '');
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+        setMensaje('mensaje-login', traducirErrorAuth(error), 'error');
+    }
+});
+
+document.getElementById('btn-cerrar-sesion').addEventListener('click', () => signOut(auth));
+
+function traducirErrorAuth(error) {
+    const codigo = error.code || '';
+    if (codigo.includes('email-already-in-use')) return 'Ese correo ya tiene una cuenta. Inicia sesión.';
+    if (codigo.includes('invalid-credential') || codigo.includes('wrong-password') || codigo.includes('user-not-found')) return 'Correo o contraseña incorrectos.';
+    if (codigo.includes('weak-password')) return 'La contraseña debe tener al menos 6 caracteres.';
+    if (codigo.includes('invalid-email')) return 'El correo no es válido.';
+    return 'Ocurrió un error: ' + (error.message || codigo);
+}
+
+// ---------- Estado de sesión ----------
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        usuarioActual = null;
+        ocultar('caja-usuario');
+        mostrar('vista-auth');
+        ['vista-profesor','vista-gestion-curso','vista-estudiante','vista-curso-estudiante'].forEach(ocultar);
+        return;
+    }
+    const snap = await getDoc(doc(db, 'usuarios', user.uid));
+    if (!snap.exists()) {
+        // Documento de usuario no encontrado (caso raro); cerramos sesión por seguridad.
+        await signOut(auth);
+        return;
+    }
+    const datos = snap.data();
+    usuarioActual = { uid: user.uid, nombre: datos.nombre, email: datos.email, rol: datos.rol };
+
+    document.getElementById('texto-usuario').textContent = `${datos.nombre}`;
+    const badge = document.getElementById('badge-rol');
+    badge.textContent = datos.rol;
+    badge.classList.toggle('profesor', datos.rol === 'profesor');
+    mostrar('caja-usuario');
+    ocultar('vista-auth');
+
+    if (datos.rol === 'profesor') {
+        mostrar('vista-profesor');
+        ocultar('vista-estudiante'); ocultar('vista-curso-estudiante'); ocultar('vista-gestion-curso');
+        cargarCursosProfesor();
+    } else {
+        mostrar('vista-estudiante');
+        ocultar('vista-profesor'); ocultar('vista-gestion-curso'); ocultar('vista-curso-estudiante');
+        cargarMisCursosEstudiante();
+        cargarCursosDisponibles();
+    }
+});
+
+// =====================================================================
+// PROFESOR: crear y listar cursos
+// =====================================================================
+document.getElementById('form-crear-curso').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('curso-nombre').value.trim();
+    const semestre = document.getElementById('curso-semestre').value.trim();
+    const descripcion = document.getElementById('curso-descripcion').value.trim();
+    setMensaje('mensaje-crear-curso', 'Creando curso...', '');
+    try {
+        await addDoc(collection(db, 'cursos'), {
+            nombre, semestre, descripcion,
+            profesorId: usuarioActual.uid,
+            profesorNombre: usuarioActual.nombre,
+            fechaCreacion: serverTimestamp()
+        });
+        document.getElementById('form-crear-curso').reset();
+        setMensaje('mensaje-crear-curso', '¡Curso creado!', 'ok');
+        cargarCursosProfesor();
+    } catch (error) {
+        setMensaje('mensaje-crear-curso', 'Error: ' + error.message, 'error');
+    }
+});
+
+async function cargarCursosProfesor() {
+    const cont = document.getElementById('lista-cursos-profesor');
+    cont.innerHTML = '<p class="cargando">Cargando cursos...</p>';
+    const snap = await getDocs(collection(db, 'cursos'));
+    const propios = snap.docs.filter(d => d.data().profesorId === usuarioActual.uid);
+    if (propios.length === 0) {
+        cont.innerHTML = '<p class="vacio">Todavía no has creado ningún curso.</p>';
+        return;
+    }
+    cont.innerHTML = '';
+    propios.forEach(d => {
+        const c = d.data();
+        const card = document.createElement('div');
+        card.className = 'curso-card';
+        card.innerHTML = `
+            <span class="semestre">${escapeHTML(c.semestre)}</span>
+            <h3>${escapeHTML(c.nombre)}</h3>
+            <p>${escapeHTML(c.descripcion || 'Sin descripción')}</p>
+            <div class="acciones">
+                <button class="chico btn-gestionar">Gestionar curso</button>
+                <button class="chico peligro btn-eliminar-curso">Eliminar</button>
+            </div>`;
+        card.querySelector('.btn-gestionar').addEventListener('click', () => abrirGestionCurso(d.id));
+        card.querySelector('.btn-eliminar-curso').addEventListener('click', async () => {
+            if (confirm(`¿Eliminar el curso "${c.nombre}"? Esta acción no se puede deshacer.`)) {
+                await deleteDoc(doc(db, 'cursos', d.id));
+                cargarCursosProfesor();
+            }
+        });
+        cont.appendChild(card);
+    });
+}
+
+document.getElementById('volver-profesor').addEventListener('click', () => {
+    ocultar('vista-gestion-curso');
+    mostrar('vista-profesor');
+});
+
+// ---------- Gestión de un curso ----------
+async function abrirGestionCurso(cursoId) {
+    cursoProfesorActivo = cursoId;
+    const snap = await getDoc(doc(db, 'cursos', cursoId));
+    if (!snap.exists()) return;
+    const c = snap.data();
+    document.getElementById('gestion-semestre').textContent = c.semestre;
+    document.getElementById('gestion-nombre-curso').textContent = c.nombre;
+    document.getElementById('gestion-descripcion-curso').textContent = c.descripcion || '';
+
+    ocultar('vista-profesor');
+    mostrar('vista-gestion-curso');
+    cambiarTabGestion('actividades');
+    cargarActividadesProfesor();
+    cargarEstudiantesInscritos();
+}
+
+document.querySelectorAll('#vista-gestion-curso .tabs .tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => cambiarTabGestion(btn.dataset.tab));
+});
+function cambiarTabGestion(tab) {
+    ['actividades','estudiantes','entregas'].forEach(t => {
+        document.getElementById('tab-contenido-' + t).classList.toggle('oculto', t !== tab);
+    });
+    document.querySelectorAll('#vista-gestion-curso .tabs .tab-btn').forEach(b => {
+        b.classList.toggle('activo', b.dataset.tab === tab);
+    });
+    if (tab === 'entregas') cargarSelectorActividadesEntregas();
+}
+
+// ---------- Actividades (profesor) ----------
+document.getElementById('form-crear-actividad').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const titulo = document.getElementById('act-titulo').value.trim();
+    const tipo = document.getElementById('act-tipo').value;
+    const fechaLimite = document.getElementById('act-fecha').value;
+    const peso = parseFloat(document.getElementById('act-peso').value);
+    const descripcion = document.getElementById('act-descripcion').value.trim();
+    setMensaje('mensaje-crear-actividad', 'Guardando...', '');
+    try {
+        await addDoc(collection(db, 'cursos', cursoProfesorActivo, 'actividades'), {
+            titulo, tipo, fechaLimite, peso, descripcion,
+            fechaCreacion: serverTimestamp()
+        });
+        document.getElementById('form-crear-actividad').reset();
+        setMensaje('mensaje-crear-actividad', '¡Actividad agregada!', 'ok');
+        cargarActividadesProfesor();
+    } catch (error) {
+        setMensaje('mensaje-crear-actividad', 'Error: ' + error.message, 'error');
+    }
+});
+
+async function cargarActividadesProfesor() {
+    const cont = document.getElementById('lista-actividades-profesor');
+    cont.innerHTML = '<p class="cargando">Cargando...</p>';
+    const snap = await getDocs(query(collection(db, 'cursos', cursoProfesorActivo, 'actividades'), orderBy('fechaLimite', 'asc')));
+    if (snap.empty) { cont.innerHTML = '<p class="vacio">Aún no hay actividades en este curso.</p>'; return; }
+    cont.innerHTML = '';
+    snap.forEach(d => {
+        const a = d.data();
+        const item = document.createElement('div');
+        item.className = 'actividad-item';
+        item.innerHTML = `
+            <div class="encabezado">
+                <div>
+                    <span class="tipo-pill">${escapeHTML(a.tipo)}</span>
+                    <h4>${escapeHTML(a.titulo)}</h4>
+                    <p class="detalle-pequeno">Fecha límite: ${escapeHTML(a.fechaLimite)} · Peso: ${a.peso}% de la nota final</p>
+                    <p class="detalle-pequeno">${escapeHTML(a.descripcion || '')}</p>
+                </div>
+                <button class="chico peligro btn-borrar-act">Eliminar</button>
+            </div>`;
+        item.querySelector('.btn-borrar-act').addEventListener('click', async () => {
+            if (confirm(`¿Eliminar "${a.titulo}"? También se perderá el acceso a las entregas asociadas.`)) {
+                await deleteDoc(doc(db, 'cursos', cursoProfesorActivo, 'actividades', d.id));
+                cargarActividadesProfesor();
+            }
+        });
+        cont.appendChild(item);
+    });
+}
+
+// ---------- Estudiantes inscritos ----------
+async function cargarEstudiantesInscritos() {
+    const cont = document.getElementById('lista-estudiantes');
+    cont.innerHTML = '<p class="cargando">Cargando...</p>';
+    const snap = await getDocs(collection(db, 'cursos', cursoProfesorActivo, 'inscritos'));
+    if (snap.empty) { cont.innerHTML = '<p class="vacio">Todavía no hay estudiantes inscritos.</p>'; return; }
+    let filas = '';
+    snap.forEach(d => {
+        const e = d.data();
+        filas += `<tr><td>${escapeHTML(e.nombre)}</td><td>${escapeHTML(e.email)}</td></tr>`;
+    });
+    cont.innerHTML = `<table><tr><th>Nombre</th><th>Correo</th></tr>${filas}</table>`;
+}
+
+// ---------- Entregas y calificación ----------
+async function cargarSelectorActividadesEntregas() {
+    const sel = document.getElementById('selector-actividad-entregas');
+    sel.innerHTML = '<option value="">-- Elige una actividad --</option>';
+    const snap = await getDocs(collection(db, 'cursos', cursoProfesorActivo, 'actividades'));
+    snap.forEach(d => {
+        const a = d.data();
+        const opt = document.createElement('option');
+        opt.value = d.id;
+        opt.textContent = `${a.titulo} (${a.tipo})`;
+        sel.appendChild(opt);
+    });
+}
+document.getElementById('selector-actividad-entregas').addEventListener('change', (e) => {
+    if (e.target.value) cargarEntregas(e.target.value);
+    else document.getElementById('lista-entregas').innerHTML = '';
+});
+
+async function cargarEntregas(actividadId) {
+    const cont = document.getElementById('lista-entregas');
+    cont.innerHTML = '<p class="cargando">Cargando...</p>';
+
+    const [inscritosSnap, entregasSnap, calificacionesSnap] = await Promise.all([
+        getDocs(collection(db, 'cursos', cursoProfesorActivo, 'inscritos')),
+        getDocs(collection(db, 'cursos', cursoProfesorActivo, 'actividades', actividadId, 'entregas')),
+        getDocs(collection(db, 'cursos', cursoProfesorActivo, 'actividades', actividadId, 'calificaciones'))
+    ]);
+
+    const entregasPorUid = {};
+    entregasSnap.forEach(d => entregasPorUid[d.id] = d.data());
+    const calificacionesPorUid = {};
+    calificacionesSnap.forEach(d => calificacionesPorUid[d.id] = d.data());
+
+    if (inscritosSnap.empty) { cont.innerHTML = '<p class="vacio">No hay estudiantes inscritos todavía.</p>'; return; }
+
+    cont.innerHTML = '';
+    inscritosSnap.forEach(d => {
+        const est = d.data();
+        const uid = d.id;
+        const entrega = entregasPorUid[uid];
+        const calificacion = calificacionesPorUid[uid];
+
+        const bloque = document.createElement('div');
+        bloque.className = 'actividad-item';
+        bloque.innerHTML = `
+            <div class="encabezado">
+                <div>
+                    <h4>${escapeHTML(est.nombre)}</h4>
+                    <p class="detalle-pequeno">${escapeHTML(est.email)}</p>
+                </div>
+                <div>${entrega ? '<span class="estado-entregado">Entregado</span>' : '<span class="estado-pendiente">Sin entregar</span>'}</div>
+            </div>
+            ${entrega ? `
+                <p class="detalle-pequeno"><strong>Respuesta:</strong> ${escapeHTML(entrega.texto || '(sin texto)')}</p>
+                ${entrega.enlace ? `<p class="detalle-pequeno"><strong>Enlace:</strong> <a href="${escapeHTML(entrega.enlace)}" target="_blank" rel="noopener">${escapeHTML(entrega.enlace)}</a></p>` : ''}
+            ` : ''}
+            <div class="fila" style="margin-top:10px;">
+                <div>
+                    <label>Nota (0.0 - 5.0)</label>
+                    <input type="number" step="0.1" min="0" max="5" class="input-nota" value="${calificacion ? calificacion.nota : ''}">
+                </div>
+                <div>
+                    <label>Comentario</label>
+                    <input type="text" class="input-comentario" value="${calificacion ? escapeHTML(calificacion.comentario || '') : ''}">
+                </div>
+            </div>
+            <button class="chico btn-guardar-nota" style="margin-top:10px;">Guardar calificación</button>
+            <p class="mensaje" id="msg-nota-${uid}"></p>
+        `;
+        bloque.querySelector('.btn-guardar-nota').addEventListener('click', async () => {
+            const nota = parseFloat(bloque.querySelector('.input-nota').value);
+            const comentario = bloque.querySelector('.input-comentario').value.trim();
+            if (isNaN(nota) || nota < 0 || nota > 5) {
+                setMensaje(`msg-nota-${uid}`, 'Ingresa una nota válida entre 0.0 y 5.0', 'error');
+                return;
+            }
+            try {
+                await setDoc(doc(db, 'cursos', cursoProfesorActivo, 'actividades', actividadId, 'calificaciones', uid), {
+                    nota, comentario, fechaCalificacion: serverTimestamp()
+                });
+                setMensaje(`msg-nota-${uid}`, 'Calificación guardada.', 'ok');
+            } catch (error) {
+                setMensaje(`msg-nota-${uid}`, 'Error: ' + error.message, 'error');
+            }
+        });
+        cont.appendChild(bloque);
+    });
+}
+
+// =====================================================================
+// ESTUDIANTE: cursos disponibles, inscripción, mis cursos
+// =====================================================================
+document.querySelectorAll('#vista-estudiante .tabs .tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const tab = btn.dataset.tabEst;
+        document.getElementById('tab-est-mis-cursos').classList.toggle('oculto', tab !== 'mis-cursos');
+        document.getElementById('tab-est-disponibles').classList.toggle('oculto', tab !== 'disponibles');
+        document.querySelectorAll('#vista-estudiante .tabs .tab-btn').forEach(b => b.classList.toggle('activo', b === btn));
+    });
+});
+
+async function cargarCursosDisponibles() {
+    const cont = document.getElementById('lista-cursos-disponibles');
+    cont.innerHTML = '<p class="cargando">Cargando...</p>';
+    const [cursosSnap, inscrSnapCheck] = await Promise.all([
+        getDocs(collection(db, 'cursos')),
+        Promise.resolve(null)
+    ]);
+    if (cursosSnap.empty) { cont.innerHTML = '<p class="vacio">No hay cursos publicados todavía.</p>'; return; }
+    cont.innerHTML = '';
+    for (const d of cursosSnap.docs) {
+        const c = d.data();
+        const inscritoSnap = await getDoc(doc(db, 'cursos', d.id, 'inscritos', usuarioActual.uid));
+        const yaInscrito = inscritoSnap.exists();
+        const card = document.createElement('div');
+        card.className = 'curso-card';
+        card.innerHTML = `
+            <span class="semestre">${escapeHTML(c.semestre)}</span>
+            <h3>${escapeHTML(c.nombre)}</h3>
+            <p>${escapeHTML(c.descripcion || 'Sin descripción')} · Profesor: ${escapeHTML(c.profesorNombre || '')}</p>
+            <div class="acciones">
+                <button class="chico btn-inscribir" ${yaInscrito ? 'disabled' : ''}>${yaInscrito ? 'Ya estás inscrito' : 'Inscribirme'}</button>
+            </div>`;
+        if (!yaInscrito) {
+            card.querySelector('.btn-inscribir').addEventListener('click', async () => {
+                await setDoc(doc(db, 'cursos', d.id, 'inscritos', usuarioActual.uid), {
+                    nombre: usuarioActual.nombre, email: usuarioActual.email, fechaInscripcion: serverTimestamp()
+                });
+                cargarCursosDisponibles();
+                cargarMisCursosEstudiante();
+            });
+        }
+        cont.appendChild(card);
+    }
+}
+
+async function cargarMisCursosEstudiante() {
+    const cont = document.getElementById('lista-mis-cursos');
+    cont.innerHTML = '<p class="cargando">Cargando...</p>';
+    const cursosSnap = await getDocs(collection(db, 'cursos'));
+    const misCursos = [];
+    for (const d of cursosSnap.docs) {
+        const inscritoSnap = await getDoc(doc(db, 'cursos', d.id, 'inscritos', usuarioActual.uid));
+        if (inscritoSnap.exists()) misCursos.push({ id: d.id, ...d.data() });
+    }
+    if (misCursos.length === 0) {
+        cont.innerHTML = '<p class="vacio">Todavía no estás inscrito en ningún curso. Ve a "Cursos disponibles".</p>';
+        return;
+    }
+    cont.innerHTML = '';
+    misCursos.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'curso-card';
+        card.innerHTML = `
+            <span class="semestre">${escapeHTML(c.semestre)}</span>
+            <h3>${escapeHTML(c.nombre)}</h3>
+            <p>${escapeHTML(c.descripcion || '')}</p>
+            <div class="acciones"><button class="chico btn-abrir-curso">Entrar al curso</button></div>`;
+        card.querySelector('.btn-abrir-curso').addEventListener('click', () => abrirCursoEstudiante(c.id));
+        cont.appendChild(card);
+    });
+}
+
+document.getElementById('volver-estudiante').addEventListener('click', () => {
+    ocultar('vista-curso-estudiante');
+    mostrar('vista-estudiante');
+});
+
+async function abrirCursoEstudiante(cursoId) {
+    cursoEstudianteActivo = cursoId;
+    const snap = await getDoc(doc(db, 'cursos', cursoId));
+    if (!snap.exists()) return;
+    const c = snap.data();
+    document.getElementById('est-semestre').textContent = c.semestre;
+    document.getElementById('est-nombre-curso').textContent = c.nombre;
+    document.getElementById('est-descripcion-curso').textContent = c.descripcion || '';
+
+    ocultar('vista-estudiante');
+    mostrar('vista-curso-estudiante');
+    cargarActividadesEstudiante();
+}
+
+async function cargarActividadesEstudiante() {
+    const cont = document.getElementById('lista-actividades-estudiante');
+    cont.innerHTML = '<p class="cargando">Cargando actividades...</p>';
+    const snap = await getDocs(query(collection(db, 'cursos', cursoEstudianteActivo, 'actividades'), orderBy('fechaLimite', 'asc')));
+    if (snap.empty) {
+        cont.innerHTML = '<p class="vacio">El profesor aún no ha publicado actividades en este curso.</p>';
+        document.getElementById('est-nota-acumulada').textContent = '--';
+        return;
+    }
+    cont.innerHTML = '';
+    let sumaPonderada = 0, pesoCalificado = 0, pesoTotal = 0;
+
+    for (const d of snap.docs) {
+        const a = d.data();
+        pesoTotal += a.peso;
+        const actividadId = d.id;
+
+        const [entregaSnap, calificacionSnap] = await Promise.all([
+            getDoc(doc(db, 'cursos', cursoEstudianteActivo, 'actividades', actividadId, 'entregas', usuarioActual.uid)),
+            getDoc(doc(db, 'cursos', cursoEstudianteActivo, 'actividades', actividadId, 'calificaciones', usuarioActual.uid))
+        ]);
+        const entrega = entregaSnap.exists() ? entregaSnap.data() : null;
+        const calificacion = calificacionSnap.exists() ? calificacionSnap.data() : null;
+
+        if (calificacion) {
+            sumaPonderada += calificacion.nota * a.peso;
+            pesoCalificado += a.peso;
+        }
+
+        const item = document.createElement('div');
+        item.className = 'actividad-item';
+        item.innerHTML = `
+            <div class="encabezado">
+                <div>
+                    <span class="tipo-pill">${escapeHTML(a.tipo)}</span>
+                    <h4>${escapeHTML(a.titulo)}</h4>
+                    <p class="detalle-pequeno">Fecha límite: ${escapeHTML(a.fechaLimite)} · Peso: ${a.peso}%</p>
+                    <p class="detalle-pequeno">${escapeHTML(a.descripcion || '')}</p>
+                </div>
+                <div>${calificacion ? `<span class="calificacion-pill">Nota: ${calificacion.nota}/5</span>` : (entrega ? '<span class="estado-entregado">Entregado, pendiente de calificar</span>' : '<span class="estado-pendiente">Sin entregar</span>')}</div>
+            </div>
+            ${calificacion && calificacion.comentario ? `<p class="detalle-pequeno"><strong>Comentario del profesor:</strong> ${escapeHTML(calificacion.comentario)}</p>` : ''}
+            <div style="margin-top:10px;">
+                <label>Tu respuesta</label>
+                <textarea class="input-texto-entrega" rows="3" placeholder="Escribe tu respuesta aquí...">${entrega ? escapeHTML(entrega.texto || '') : ''}</textarea>
+                <label>Enlace (opcional, ej. Google Drive)</label>
+                <input type="url" class="input-enlace-entrega" value="${entrega ? escapeHTML(entrega.enlace || '') : ''}" placeholder="https://...">
+                <button class="chico btn-enviar-entrega" style="margin-top:10px;">${entrega ? 'Actualizar entrega' : 'Enviar entrega'}</button>
+                <p class="mensaje" id="msg-entrega-${actividadId}"></p>
+            </div>
+        `;
+        item.querySelector('.btn-enviar-entrega').addEventListener('click', async () => {
+            const texto = item.querySelector('.input-texto-entrega').value.trim();
+            const enlace = item.querySelector('.input-enlace-entrega').value.trim();
+            if (!texto && !enlace) {
+                setMensaje(`msg-entrega-${actividadId}`, 'Escribe una respuesta o agrega un enlace.', 'error');
+                return;
+            }
+            try {
+                await setDoc(doc(db, 'cursos', cursoEstudianteActivo, 'actividades', actividadId, 'entregas', usuarioActual.uid), {
+                    texto, enlace, fechaEntrega: serverTimestamp()
+                });
+                setMensaje(`msg-entrega-${actividadId}`, '¡Entrega guardada!', 'ok');
+                cargarActividadesEstudiante();
+            } catch (error) {
+                setMensaje(`msg-entrega-${actividadId}`, 'Error: ' + error.message, 'error');
+            }
+        });
+        cont.appendChild(item);
+    }
+
+    document.getElementById('est-nota-acumulada').textContent =
+        pesoCalificado > 0 ? (sumaPonderada / pesoCalificado).toFixed(2) + ' / 5' : 'Sin calificar aún';
+}
+</script>
+</body>
+</html>
